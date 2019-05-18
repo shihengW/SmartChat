@@ -1,0 +1,17 @@
+{
+  "name": "socket-chat-example",
+  "version": "0.0.1",
+  "description": "my first socket.io app",
+  "dependencies": {
+    "baidu-aip-sdk": "^2.3.9",
+    "express": "^4.17.0",
+    "lame": "^1.2.4",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "socket.io": "^1.7.4",
+    "speaker": "^0.4.2"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
