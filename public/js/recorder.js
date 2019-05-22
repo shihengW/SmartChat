@@ -5,12 +5,11 @@
     window.URL = window.URL || window.webkitURL;
   
     var H5Recorder = function (stream) {
-      
-      var context = new AudioContext();
-      var audioInput = context.createMediaStreamSource(stream);
-      var recorder = context.createScriptProcessor(4096, 1, 1);
-  
-      var audioData = {
+		var audioContext = window.AudioContext || window.webkitAudioContext;
+    	var context = new audioContext();
+      	var audioInput = context.createMediaStreamSource(stream);
+      	var recorder = context.createScriptProcessor(4096, 1, 1);
+      	var audioData = {
         size: 0, //录音文件长度
         buffer: [],  //录音缓存
         inputSampleRate: context.sampleRate, //输入采样率 默认为 44.1k
@@ -159,13 +158,13 @@
   
     //获取录音机
     H5Recorder.init = function (callback) {
-      navigator.mediaDevices.getUserMedia({ audio: true })
+		navigator.mediaDevices.getUserMedia({ audio: true })
         .then(function (stream) {
           var rec = new H5Recorder(stream);
           callback(rec);
         })
         .catch(function (err) {
-          console.error(err)
+				alert(err)
         })
     }
   
