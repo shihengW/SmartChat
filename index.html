@@ -17,10 +17,10 @@
         <div id="spkr" class="d-flex justify-content-center flex-fill mp-10">
             <form>
                 <p class="text-center text-wrap p-3 font-weight-light" id="send">
-                    ...
+                    +_+
                 </p>
                 <p class="text-center text-wrap p-3 font-weight-bold" id="reply">
-                    ...
+                    +o+
                 </p>
             </form>
         </div>
@@ -35,7 +35,7 @@
                 })
 
                 function recording() {
-                    socket.emit('record');
+                    socket.emit('record', 'on');
                     $('#spkr').removeClass('btn-white');
                     $('#spkr').addClass('btn-primary');
                 }
