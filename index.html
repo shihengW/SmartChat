@@ -17,10 +17,10 @@
         <div id="spkr" class="d-flex justify-content-center flex-fill mp-10">
             <form>
                 <p class="text-center text-wrap p-3 font-weight-light" id="send">
-                    你说...
+                    ...
                 </p>
                 <p class="text-center text-wrap p-3 font-weight-bold" id="reply">
-                    我回...
+                    ...
                 </p>
             </form>
         </div>
@@ -29,24 +29,19 @@
                 var socket = io();
                 socket.on('yousay', msg => $('#send').text(msg));
                 socket.on('botsay', msg => $('#reply').text(msg));
+                socket.on('record complete', () => {
+                    $('#spkr').removeClass('btn-primary');
+                    $('#spkr').addClass('btn-white');
+                })
 
                 function recording() {
-                    socket.emit('record', 'on');
+                    socket.emit('record');
                     $('#spkr').removeClass('btn-white');
                     $('#spkr').addClass('btn-primary');
                 }
 
-                function recordDone() {
-                    socket.emit('record', 'off');
-                    $('#spkr').removeClass('btn-primary');
-                    $('#spkr').addClass('btn-white');
-                }
-
-                $('#spkr').mousedown(recording);
-                $('#spkr').mouseup(recordDone);
-
+                $('#spkr').on('mousedown',  recording);
                 $('#spkr').on('touchstart', recording);
-                $('#spkr').on('touchend', recordDone);
             });
         </script>
     </body>

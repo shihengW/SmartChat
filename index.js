@@ -5,11 +5,10 @@ let io    = require('socket.io'             )(http);
 let hear  = require('./modules/asr-service' ).hear;
 let read  = require('./modules/asr-service' ).read;
 let reply = require('./modules/chat-service').reply;
-let rec   = require('./modules/recorder'    ).recorder('rec');
+let rec   = require('./modules/recorder'    ).recorder();
 
 io.on('connection', function(socket) {
-    socket.on('record', function(toggle){
-
+    socket.on('record', function(){
         // voice -> text -> reply -> voice -> play
         let process = pcm => {
             if (pcm) {
@@ -29,15 +28,11 @@ io.on('connection', function(socket) {
             }
         }
 
-        if (toggle == 'on') {
-            rec.start()
-            .on('close', () => {
-                process(rec.complete());
-            });
-        }
-        else {
+        rec.start()
+        .on('close', () => {
+            io.to(socket.id).emit('record complete');
             process(rec.complete());
-        }
+        });
     });
 });
 
