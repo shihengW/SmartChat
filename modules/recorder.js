@@ -5,8 +5,8 @@ class Recorder{
     constructor(caller) {
         const options = {
             program: caller,             // Which program to use, either `arecord`, `rec`, or `sox`.
-            device: null,                // Recording device to use.
-            
+            device: null,                // or `plughw:1,0`, on raspberry pi
+
             bits: 16,                    // Sample size. (only for `rec` and `sox`)
             channels: 1,                 // Channel count.
             encoding: `signed-integer`,  // Encoding type. (only for `rec` and `sox`)
@@ -26,11 +26,17 @@ class Recorder{
         this.pcm_buffer = undefined;
     }
 
-    start() {
+    start(cb) {
         this.pcm_buffer = Buffer.alloc(0);
 
         this.audioRecorder.start().stream().on('data', (buff) => {
+            console.log('.');
+            
             this.pcm_buffer = Buffer.concat([this.pcm_buffer, buff]);
+
+            if (cb) {
+                cb(buff);
+            }
         });
     }
 

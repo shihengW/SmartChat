@@ -4,12 +4,12 @@ module.exports.reply = function(msg, cb) {
 
     const text = {
         'perception': {
-          'inputText': { 'text': msg },
-          'selfInfo': { 'from': 'chat' }
+            'inputText': { 'text': msg },
+            'selfInfo': { 'from': 'chat' }
         },
         'userInfo': {
-          'apiKey': '38c62badf9af4e069aacdd647e0fde7d',
-          'userId': 'swei'
+            'apiKey': '38c62badf9af4e069aacdd647e0fde7d',
+            'userId': 'swei'
         }
     };
     
@@ -21,6 +21,10 @@ module.exports.reply = function(msg, cb) {
     }
     
     request(options)
-    .then(res => cb(res))
+    .then(res => {
+        if (cb) {
+            cb(res);
+        }
+    })
     .catch(err => console.error('major err when reply ' + err));
 }

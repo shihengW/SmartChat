@@ -31,7 +31,11 @@ io.on('connection', function(socket) {
     });
 });
 
-http.listen(3000, () => console.log('listening on *:3000'));
+http.listen(3000, () => {
+    console.log('listening on *:3000')
+    console.log('For raspberry pi, do "export AUDIODEV=hw:1,0" first '
+               +'to indicate audio devices.');
+});
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
