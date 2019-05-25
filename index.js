@@ -1,32 +1,42 @@
-var app  = require('express'  )();
-var http = require('http'     ).Server(app);
-var io   = require('socket.io')(http);
+let app   = require('express'               )();
+let http  = require('http'                  ).Server(app);
+let io    = require('socket.io'             )(http);
+
+let hear  = require('./modules/asr-service' ).hear;
+let read  = require('./modules/asr-service' ).read;
+let reply = require('./modules/chat-service').reply;
+let rec   = require('./modules/recorder'    ).recorder('rec');
 
 io.on('connection', function(socket) {
-
-    const hear  = require('./modules/asr-service' ).hear;
-    const read  = require('./modules/asr-service' ).read;
-    const reply = require('./modules/chat-service').reply;
-    let   rec   = require('./modules/recorder'    ).recorder('rec');
-   
     socket.on('record', function(toggle){
+
+        // voice -> text -> reply -> voice -> play
+        let process = pcm => {
+            if (pcm) {
+                hear(pcm, (res) => {
+                    const msg = res.result[0];
+                    io.to(socket.id).emit('yousay', msg);
+
+                    reply(msg, res => {
+                        let reply = res.results[0].values.text;
+                        io.to(socket.id).emit('botsay', reply);
+                        read(reply);
+                    });
+                });
+            }
+            else {
+                console.log('pcm processed already.');
+            }
+        }
+
         if (toggle == 'on') {
-            rec.start();
+            rec.start()
+            .on('close', () => {
+                process(rec.complete());
+            });
         }
         else {
-            let pcm = rec.complete();
-            
-            hear(pcm, (res) => {
-                let msg = res.result[0];
-                
-                io.to(socket.id).emit('yousay', msg);
-        
-                reply(msg, res => {
-                    let reply = res.results[0].values.text;
-                    io.to(socket.id).emit('botsay', reply);
-                    read(reply);
-                });
-            });
+            process(rec.complete());
         }
     });
 });

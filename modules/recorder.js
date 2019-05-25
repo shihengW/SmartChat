@@ -1,8 +1,10 @@
 const AudioRecorder = require('node-audiorecorder');
 
-class Recorder{
+class Recorder extends require(`events`).EventEmitter {
 
     constructor(caller) {
+        super();
+        
         const options = {
             program: caller,             // Which program to use, either `arecord`, `rec`, or `sox`.
             device: null,                // or `plughw:1,0`, on raspberry pi
@@ -15,36 +17,43 @@ class Recorder{
             type: `wav`,                 // Format type.
             
             // Following options only available when using `rec` or `sox`.
-            silence: 3,           // Duration of silence in seconds before it stops recording.
-            thresholdStart: 0,    // Silence threshold to start recording.
-            thresholdStop: 0.5,   // Silence threshold to stop recording.
-            keepSilence: true     // Keep the silence in the recording.
+            silence: 1,                  // Duration of silence in seconds before it stops recording.
+            thresholdStart: 0,           // Silence threshold to start recording.
+            thresholdStop: 0.5,          // Silence threshold to stop recording.
+            keepSilence: false           // Keep the silence in the recording.
         };
 
         this.audioRecorder = new AudioRecorder(options, console);
 
         this.pcm_buffer = undefined;
+
+        this.recording = false;
     }
 
-    start(cb) {
+    start() {
+        let self = this;
+        this.recording  = true;
         this.pcm_buffer = Buffer.alloc(0);
-
-        this.audioRecorder.start().stream().on('data', (buff) => {
-            console.log('.');
-            
+        this.audioRecorder.start().stream()
+        .on('data', buff => {
             this.pcm_buffer = Buffer.concat([this.pcm_buffer, buff]);
-
-            if (cb) {
-                cb(buff);
-            }
+        })
+        .on('close', function (code) {
+            // Just pass it out;
+            self.emit('close', code);
         });
+
+        return this;
     }
 
     complete() {
-        console.log(this.pcm_buffer);
-        
         this.audioRecorder.stop();
 
+        if (!this.recording) {
+            return null;
+        }
+        
+        this.recording = false;
         return this.pcm_buffer;
     }
 }
