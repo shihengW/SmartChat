@@ -6,6 +6,7 @@
     "baidu-aip-sdk": "^2.3.9",
     "express": "^4.17.0",
     "lame": "^1.2.4",
+    "node-audiorecorder": "^1.4.1",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "socket.io": "^1.7.4",
