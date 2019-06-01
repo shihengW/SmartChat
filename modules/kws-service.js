@@ -1,10 +1,20 @@
-const Detector = require('snowboy').Detector;
-const Models   = require('snowboy').Models;
-
+const Detector       = require('snowboy').Detector;
+const Models         = require('snowboy').Models;
+const MAX_WAVE_SIZE  = 16000 * 5; // 5 seconds 
 const SILENCE_FRAMES = 5;
 
 // Just a wrapper to hide the configurations.
 class Kws extends Detector {
+
+    sendCommand() {
+        if (this.recording) {
+            console.log("stop recording and send cmd.");
+            
+            this.recording = false;
+
+            this.emit('command', this.pcm_buffer);
+        }
+    }
 
     onSilence() {
         console.log('sil');
@@ -13,11 +23,7 @@ class Kws extends Detector {
             --this.silCountDown;
 
             if (this.silCountDown == 0) {
-                console.log("stop recording and send cmd.");
-                
-                this.recording = false;
-
-                this.emit('command', this.pcm_buffer);
+                this.sendCommand();
             }
         }
     }
@@ -35,6 +41,11 @@ class Kws extends Detector {
             this.silCountDown = this.silCountDown > SILENCE_FRAMES
                 ? SILENCE_FRAMES
                 : this.silCountDown;
+
+            if (this.pcm_buffer.length > MAX_WAVE_SIZE) {
+                this.sendCommand();
+                console.log('reach max time');
+            }
         }
     }
 
